@@ -18,9 +18,35 @@ defmodule Issues.CLI do
     # System.halt(0)
   end
 
-  def process({user, project, _count}) do
+  def process({user, project, count}) do
     Issues.Github.fetch(user, project)
     |> decode_response
+    |> sort_in_ascending_order
+    |> Enum.take(count)
+    |> pretty_print
+  end
+
+  def pretty_print(list) do
+    IO.puts issues_header(list)
+  end
+
+  def issues_header(list) do
+  end
+
+  @doc ~S"""
+  Sorts a list of maps based on created_at key
+
+  ## Example
+
+      iex> Issues.CLI.sort_in_ascending_order([%{created_at: "2018-03-02T01:41:36Z"},%{created_at: "2018-02-02T01:41:36Z"},%{created_at: "2018-05-02T01:41:36Z"}])
+      [
+        %{created_at: "2018-02-02T01:41:36Z"},
+        %{created_at: "2018-03-02T01:41:36Z"},
+        %{created_at: "2018-05-02T01:41:36Z"}
+      ]
+  """
+  def sort_in_ascending_order(list_of_issues) do
+    Enum.sort(list_of_issues, fn is1, is2 -> Map.get(is1, :created_at) <= Map.get(is2, :created_at) end  )
   end
 
   def decode_response({:ok, body}), do: body
@@ -36,6 +62,10 @@ defmodule Issues.CLI do
   def decode_response({:error, error}) do
     {_, message} = List.keyfind(error, :message, 0)
     message
+
+    # remember to uncomment this before going into production... need to know
+    # how to have this and tests together...
+    # System.halt(2)
   end
 
   def run(argv) do
