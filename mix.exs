@@ -4,11 +4,17 @@ defmodule Issues.MixProject do
   def project do
     [
       app: :issues,
+      escript: escript_config(),
       version: "0.1.0",
+      build_embedded: Mix.env() == :prod,
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
+  end
+
+  defp escript_config do
+    [main_module: Issues.CLI]
   end
 
   # Run "mix help compile.app" to learn about applications.

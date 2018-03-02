@@ -24,3 +24,8 @@ issues-*.tar
 
 # Ignore DS_Store
 .DS_Store
+
+# Ignore vim swap files
+*.swp
+*.swo
+

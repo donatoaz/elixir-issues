@@ -1,21 +1,11 @@
 defmodule Issues.CLI do
   @default_count 4
 
-  @doc ~S"""
-  Just making sure help is working, for now
-
-  ## Examples
-
-      iex> Issues.CLI.run(["-h"])
-      "Usage: issues <user> <project> [count | 4]"
-
-      iex> Issues.CLI.run(["--help", "anything"])
-      "Usage: issues <user> <project> [count | 4]"
-
-  """
   def process(:help) do
-    "Usage: issues <user> <project> [count | #{@default_count}]"
-    # System.halt(0)
+    IO.puts("Usage: issues <user> <project> [count | #{@default_count}]")
+    # unless Mix.env == :test do
+    System.halt(0)
+    # end
   end
 
   def process({user, project, count}) do
@@ -27,10 +17,54 @@ defmodule Issues.CLI do
   end
 
   def pretty_print(list) do
-    IO.puts issues_header(list)
+    issues_header(list)
+    print_rows(list)
+  end
+
+  def print_rows(list) do
+    num_col_w = column_width(list, "number")
+    created_at_col_w = column_width(list, "created_at")
+    title_col_w = column_width(list, "title")
+
+    Enum.each(list, fn mp ->
+      num_r = String.pad_trailing(Kernel.to_string(Map.get(mp, "number")), num_col_w)
+      created_at_r = String.pad_trailing(Map.get(mp, "created_at"), created_at_col_w)
+      title_r = String.pad_trailing(Map.get(mp, "title"), title_col_w)
+      IO.puts(" #{num_r}| #{created_at_r} | #{title_r} ")
+    end)
+  end
+
+  @doc ~S"""
+  Returns the column width of `column` in a `list` os maps based on the maximum 
+  String.length of values with key `column`
+
+  ## Examples
+
+      iex> Issues.CLI.column_width([%{"number" => 451}, %{"number" => 3}, %{"number" => 9999}], "number")
+      4
+
+      iex> Issues.CLI.column_width([%{"title" => "Testing stuff"}, %{"title" => "Really Long Stuff"}, %{"title" => "O2"}], "title")
+      17
+
+  """
+  def column_width(list, column) do
+    list
+    |> Enum.map(fn x -> Map.get(x, column) end)
+    |> Enum.map(&Kernel.to_string(&1))
+    |> Enum.map(&String.length(&1))
+    |> Enum.max()
   end
 
   def issues_header(list) do
+    num_col_w = column_width(list, "number")
+    created_at_col_w = column_width(list, "created_at")
+    title_col_w = column_width(list, "title")
+
+    num_h = String.pad_trailing("#", num_col_w)
+    created_at_h = String.pad_trailing("Created at", created_at_col_w)
+    title_h = String.pad_trailing("Title", title_col_w)
+
+    IO.puts(" #{num_h}| #{created_at_h} | #{title_h} ")
   end
 
   @doc ~S"""
@@ -46,7 +80,9 @@ defmodule Issues.CLI do
       ]
   """
   def sort_in_ascending_order(list_of_issues) do
-    Enum.sort(list_of_issues, fn is1, is2 -> Map.get(is1, :created_at) <= Map.get(is2, :created_at) end  )
+    Enum.sort(list_of_issues, fn is1, is2 ->
+      Map.get(is1, :created_at) <= Map.get(is2, :created_at)
+    end)
   end
 
   def decode_response({:ok, body}), do: body
@@ -61,14 +97,18 @@ defmodule Issues.CLI do
   """
   def decode_response({:error, error}) do
     {_, message} = List.keyfind(error, :message, 0)
-    message
 
     # remember to uncomment this before going into production... need to know
     # how to have this and tests together...
-    # System.halt(2)
+    # if Mix.env == :test do
+    #   message
+    # else
+    IO.puts(message)
+    System.halt(2)
+    # end
   end
 
-  def run(argv) do
+  def main(argv) do
     argv
     |> parse_args
     |> process

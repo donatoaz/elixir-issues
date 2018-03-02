@@ -1,5 +1,5 @@
 defmodule Issues.Github do
-  @user_agent [ { "User-agent", "Elixir donatoaz@gmail.com" } ]
+  @user_agent [{"User-agent", "Elixir donatoaz@gmail.com"}]
 
   @doc ~S"""
   GETs the URL for a given user and project and processes the response
@@ -12,8 +12,8 @@ defmodule Issues.Github do
   """
   def fetch(user, project) do
     issues_url(user, project)
-      |> HTTPoison.get(@user_agent)
-      |> handle_response
+    |> HTTPoison.get(@user_agent)
+    |> handle_response
   end
 
   @doc ~S"""
@@ -39,11 +39,11 @@ defmodule Issues.Github do
       {:error, %{"name" => "Devin Torres", "age" => 27}}
 
   """
-  def handle_response({:ok, %{status_code: 200, body: body  }}) do
+  def handle_response({:ok, %{status_code: 200, body: body}}) do
     {:ok, Poison.Parser.parse!(body)}
   end
 
-  def handle_response({_, %{status_code: _, body: body  }}) do
+  def handle_response({_, %{status_code: _, body: body}}) do
     {:error, Poison.Parser.parse!(body)}
   end
 end
