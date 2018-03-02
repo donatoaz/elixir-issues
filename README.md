@@ -1,21 +1,16 @@
 # Issues
 
-**TODO: Add description**
+Issues command-line tool from Dave Thomas' book Programming Elixir.
 
-## Installation
+I need to finish this book so I can buy a new book... Wife told me so.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `issues` to your list of dependencies in `mix.exs`:
+## How to
 
-```elixir
-def deps do
-  [
-    {:issues, "~> 0.1.0"}
-  ]
-end
+Simply run
+
+```
+issues USER_NAME PROJECT_NAME [count]
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/issues](https://hexdocs.pm/issues).
+It returns the oldest `count` issues from the repo `USER_NAME/PROJECT_NAME`
 
