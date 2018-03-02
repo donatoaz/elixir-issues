@@ -92,13 +92,12 @@ defmodule Issues.CLI do
 
   ## Example
 
-      iex> Issues.CLI.decode_response({:error, [message: "Error message"]})
+      iex> Issues.CLI.decode_response({:error, %{"message" => "Error message"})
       "Error message"
   """
   def decode_response({:error, error}) do
-    {_, message} = List.keyfind(error, :message, 0)
+    message = Map.get(error, "message", 0)
 
-    # remember to uncomment this before going into production... need to know
     # how to have this and tests together...
     # if Mix.env == :test do
     #   message
